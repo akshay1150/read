@@ -68,3 +68,17 @@
   handlers:
   - name: restart apache2
     service: name=apache2 state=restarted
+package { ‘curl’:ensure => ‘installed’
+before => Exec[‘install script’]
+}
+exec { ‘install script’:
+command => ‘/usr/bin/curl’
+}
+
+user { 'mitchell':
+  ensure     => present,
+  uid        => '1000',
+  gid        => '1000',
+  shell      => '/bin/bash',
+  home       => '/home/mitchell'
+}
