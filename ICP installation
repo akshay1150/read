@@ -1,0 +1,45 @@
+sudo apt-get update
+sudo apt-get get install python
+sudo sysctl vm.max_map_count
+sudo sysctl -w vm.max_map_count=262144
+echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf
+sudo sysctl net.ipv4.ip_local port_range
+sudo apt-get install apt-transport-https ca-certificates software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository \
+"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+$(lsb_release -cs) \
+stable"
+sudo apt-get install docker-ce=18.03.1~ce-0~ubuntu
+sudo systemctl enable docker
+sudo docker pull ibmcom/icp-inception:2.1.0.2
+sudo mkdir /opt/ibm-cloud-private-ce-2.1.0.2
+cd /opt/ibm-cloud-private-ce-2.1.0.2
+sudo docker run -e LICENSE=accept \
+-v "$(pwd)":/data ibmcom/icp-inception:2.1.0.2 cp -r cluster /data
+sudo su -
+ssh-keygen -b 4096 -t rsa -f ~/.ssh/id_rsa -N ""
+cat ~/.ssh/id_rsa.pub | sudo tee -a ~/.ssh/authorized_keys
+exit
+sudo nano cluster/hosts and modify it
+sudo cp /root/.ssh/id_rsa ./cluster/ssh_key
+sudo nano config.yaml
+change dns yes
+# Logging service configuration
+logging:
+ maxAge: 1
+ storage:
+   es:
+     size: 20Gi
+     path: /opt/ibm/cfc/logging/elasticsearch
+   ls:
+     size: 5Gi
+     path: /opt/ibm/cfc/logging/logstash
+ kibana:
+   install: true
+cd cluster
+sudo docker run --net=host -t -e LICENSE=accept \
+-v "$(pwd)":/installer/cluster ibmcom/icp-inception:2.1.0.2 install
+
+sudo docker run -e LICENSE=accept --net=host -t -v "$(pwd)":/installer/cluster ibmcom/icp-inception:2.1.0.2 uninstall
+sudo docker system prune -af
