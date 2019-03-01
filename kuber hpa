@@ -1,0 +1,24 @@
+kubectl run php-apache \   
+
+  --image=gcr.io/google\_containers/hpa-example \
+
+  --requests=cpu=500m,memory=500M --expose --port=80  
+
+  kubectl run -i --tty service-test --image=busybox /bin/sh
+  
+  wget -q -O- http://php-apache.default.svc.cluster.local
+
+  kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=10
+  
+  API
+   kubectl get pods --all-namespaces -o json  | jq -r '.items[] | select(.status.phase != "Running" or ([ .status.conditions[] | select(.type == "Ready" and .state == false) ] | length ) == 1 ) | .metadata.namespace + "/" + .metadata.name + "/" +.status.phase + "/" + .status.podIP'
+
+   
+   import requests
+r=requests.get("http://localhost:8888/api/v1/namespaces/default/pods")
+data= r.json()
+a=[]
+b=[]
+for var in data['items']:
+   print(type(var))
+   print(var['metadata']['name'])
