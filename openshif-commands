@@ -1,0 +1,18 @@
+sudo yum install -y atomic-openshift-clients
+oc login https;//ip:port    -u developer -p developer
+oc new-project pname
+oc adm policy add-scc-to-user anyuid -z default
+oc new-app --docker-image=infrastructure.lab.example.com:5000/nginx:latest --insecure-registry=true --name=nginx
+TO create an app based on image from docker hub:
+oc new-app mysql MYSQL_USER=user MYSQL_PASSWORD=pass MYSQL_DATABASE=testdb -l db=mysql
+To create an app based on a image from private regidtry
+oc new-app --docker-image=myregistry.com/mycomapay/myapp --name=myapp
+create app from source code from git
+oc new-app https://github.com/openshift/ruby-hello-world --name=ruby-hello
+ mysql -h 172.30.131.89 -u admin -p
+oc adm policy add-cluster-role-to-user cluster-admin admin
+ that they are not allowed to use a root user within the container
+ oadm policy add-scc-to-user anyuid -z default
+ oc edit scc anyuid
+ vi /etc/sysconfig/docker
+OPTIONS = --selinux-enabled --insecure-registry 192.168.122.0/24
