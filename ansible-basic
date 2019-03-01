@@ -1,0 +1,19 @@
+[defaults]
+host_key_checking = False
+ export ANSIBLE_HOST_KEY_CHECKING=False
+ ssh -o StrictHostKeyChecking=no
+ [ssh_connection]
+retries=2
+[defaults] 
+log_path=/path/to/logfile
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu:latest
+    # Just spin & wait forever
+    CMD ["sh", "-c", "tail -f /dev/null"]
+usermod -aG sudo username
