@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+ name: chefserver
+ labels:
+   app: chef-server-service-1
+spec:
+ type: NodePort
+ ports:
+ - port: 443
+   targetPort: 443
+   protocol: TCP
+ selector:
+   app: chef
