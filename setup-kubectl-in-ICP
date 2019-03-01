@@ -1,0 +1,38 @@
+mkdir -p $HOME/.kube
+cp /etc/cfc/conf/kube-controller-manager.* $HOME/.kube
+cat <<EOF > $HOME/.kube/config
+apiVersion: v1
+clusters:
+- cluster:
+    insecure-skip-tls-verify: true
+    server: https://mycluster.icp:8001
+  name: cfc-cluster
+contexts:
+- context:
+    cluster: cfc-cluster
+    user: user
+  name: kubectl
+current-context: kubectl
+kind: Config
+preferences: {}
+users:
+- name: user
+  user:
+    client-certificate: kube-controller-manager.crt
+    client-key: kube-controller-manager.key
+EOF
+
+SECRET=`kubectl get secrets -n kube-system | grep default-token | awk '{ print $1 }'`
+TOKEN=`kubectl get secret $SECRET -n kube-system -o jsonpath={.data.token} | base64 -d`
+kubectl config set-credentials admin-user --token=$TOKEN
+kubectl config set-context admin-context --user=admin-user --cluster=cfc-cluster
+kubectl config use-context admin-context
+kubectl get pods -n kube-system -o name | grep auth-idp
+
+pod/auth-idp-b942https://www.ibm.com/support/knowledgecenter/SSBS6K_2.1.0.2/getting_started/known_issues.htmlm
+kube-dns-amd64-kg9pj
+kubectl delete deployment -n kube-system tiller-deploy
+helm init --upgrade
+
+
+
