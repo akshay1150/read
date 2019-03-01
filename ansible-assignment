@@ -1,0 +1,70 @@
+- hosts: webserver
+  gather_facts: false
+  tasks:
+  - name: install apache
+    apt: name=apache2 state=present
+
+  - name: apache-service
+    service: name=apache2 state=started enabled=yes
+
+  - name: ansible create directory example
+    file:
+      path: /home/user/website/
+      state: directory
+
+  - name: copy apache file
+    copy: src=~/demo.conf dest=/etc/apache2/sites-available mode=0777
+    notify: restart apache2
+
+  - name: deactivate
+    file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
+    notify: restart apache2
+
+  - name: activate
+    file: src=/etc/apache2/sites-available/demo.conf dest=/etc/apache2/sites-enabled/demo.conf state=link
+    notify: restart apache2
+
+  - name: Add the user
+    user:
+     name: akshay2
+     group: root
+     shell: /bin/bash
+     password: upassword | password_hash('sha512')
+
+  - name: Remove the user 'akshay'
+    user:
+     name: akshay
+     state: absent
+     remove: yes
+
+  - name: Transfer the script
+    copy: src=~/script.sh dest=/home/ mode=0777
+
+  - name: Execute the script
+    command: /bin/bash /home/script.sh
+#    register: newuser
+
+#  - name: generate random password for user only on creation
+#    shell: /usr/bin/openssl rand -base64 32 | passwd --stdin deployer
+#    when: newuser.changed
+
+     - name: Remove the user 'akshay'
+    user:
+     name: akshay
+     state: absent
+     remove: yes
+
+  - name: Transfer the script
+    copy: src=~/script.sh dest=/home/ mode=0777
+
+  - name: Execute the script
+    command: /bin/bash /home/script.sh
+#    register: newuser
+
+#  - name: generate random password for user only on creation
+#    shell: /usr/bin/openssl rand -base64 32 | passwd --stdin deployer
+#    when: newuser.changed
+
+  handlers:
+  - name: restart apache2
+    service: name=apache2 state=restarted
